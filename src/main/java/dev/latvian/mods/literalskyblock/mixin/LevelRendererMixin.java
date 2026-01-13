@@ -3,6 +3,7 @@ package dev.latvian.mods.literalskyblock.mixin;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexSorting;
 import dev.latvian.mods.literalskyblock.client.CapturedInfo;
 import dev.latvian.mods.literalskyblock.client.LSBClient;
 import dev.latvian.mods.literalskyblock.client.LevelRendererLSB;
@@ -95,6 +96,12 @@ public abstract class LevelRendererMixin implements LevelRendererLSB {
 		double camY = camPos.y();
 		double camZ = camPos.z();
 		Frustum frustum = this.capturedFrustum != null ? this.capturedFrustum : this.cullingFrustum;
+		Matrix4f previousProjection = RenderSystem.getProjectionMatrix();
+		int windowWidth = this.minecraft.getWindow().getWidth();
+		int windowHeight = this.minecraft.getWindow().getHeight();
+
+		RenderSystem.viewport(0, 0, target.width, target.height);
+		RenderSystem.setProjectionMatrix(projectionMatrix, VertexSorting.DISTANCE_TO_ORIGIN);
 
 		FogRenderer.setupColor(camera, delta, this.minecraft.level, this.minecraft.options.getEffectiveRenderDistance(), gameRenderer.getDarkenWorldAmount(delta));
 		FogRenderer.levelFogColor();
@@ -119,6 +126,9 @@ public abstract class LevelRendererMixin implements LevelRendererLSB {
 		}
 
 		this.renderSnowAndRain(lightTexture, delta, camX, camY, camZ);
+
+		RenderSystem.setProjectionMatrix(previousProjection, VertexSorting.DISTANCE_TO_ORIGIN);
+		RenderSystem.viewport(0, 0, windowWidth, windowHeight);
 
 		modelViewStack.popMatrix();
 		RenderSystem.applyModelViewMatrix();

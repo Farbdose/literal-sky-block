@@ -30,6 +30,11 @@ public class LSBClient {
 	}
 
 	public static RenderType getSkyRenderType() {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc == null || mc.getWindow() == null) {
+			return RenderType.endGateway();
+		}
+
 		if (skyRenderType == null) {
 			skyRenderType = RenderType.create(LiteralSkyBlock.SKY.toString(), DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS, 256, false, false, RenderType.CompositeState.builder()
 				.setShaderState(new RenderStateShard.ShaderStateShard(LSBClient::getSkyShader))

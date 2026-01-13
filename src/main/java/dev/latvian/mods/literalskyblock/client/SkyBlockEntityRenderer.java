@@ -16,7 +16,7 @@ public class SkyBlockEntityRenderer implements BlockEntityRenderer<SkyBlockEntit
 
 	@Override
 	public void render(SkyBlockEntity entity, float delta, PoseStack poseStack, MultiBufferSource source, int light1, int light2) {
-		renderCube(entity, poseStack.last().pose(), source.getBuffer(entity instanceof SkyBlockEntity e ? (RenderType) e.projection.renderType : RenderType.endGateway()));
+		renderCube(entity, poseStack.last().pose(), source.getBuffer(entity instanceof SkyBlockEntity e ? e.projection.getRenderType() : RenderType.endGateway()));
 	}
 
 	private void renderCube(SkyBlockEntity entity, Matrix4f matrix, VertexConsumer buffer) {

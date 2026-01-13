@@ -59,7 +59,7 @@ public abstract class LevelRendererMixin implements LevelRendererLSB {
 
 	@Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch(Lnet/minecraft/client/renderer/RenderType;)V", ordinal = 6, shift = At.Shift.AFTER))
 	private void lsb$drawSkyBuffer(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f frustumMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
-		renderBuffers.bufferSource().endBatch(LSBClient.SKY_RENDER_TYPE);
+		renderBuffers.bufferSource().endBatch(LSBClient.getSkyRenderType());
 	}
 
 	@Shadow

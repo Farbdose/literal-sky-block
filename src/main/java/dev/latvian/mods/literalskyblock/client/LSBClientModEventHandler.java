@@ -21,7 +21,7 @@ public class LSBClientModEventHandler {
 	public static void setup(FMLClientSetupEvent event) {
 		BlockEntityRenderers.register(LSBBlockEntities.SKY_BLOCK.get(), SkyBlockEntityRenderer::new);
 
-		ProjectionType.SKY.renderType = LSBClient.SKY_RENDER_TYPE;
+		ProjectionType.SKY.renderType = LSBClient.getSkyRenderType();
 		ProjectionType.VOID.renderType = RenderType.endGateway();
 	}
 

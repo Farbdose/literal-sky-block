@@ -19,6 +19,7 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 public class LSBClient {
 	private static ShaderInstance skyShader;
 	private static TextureTarget skyRenderTarget;
+	private static RenderType skyRenderType;
 
 	public static ShaderInstance getSkyShader() {
 		return skyShader;
@@ -28,11 +29,17 @@ public class LSBClient {
 		skyShader = shader;
 	}
 
-	public static final RenderType SKY_RENDER_TYPE = RenderType.create(LiteralSkyBlock.SKY.toString(), DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS, 256, false, false, RenderType.CompositeState.builder()
-		.setShaderState(new RenderStateShard.ShaderStateShard(LSBClient::getSkyShader))
-		.setTextureState(new RenderStateShard.EmptyTextureStateShard(LSBClient::setSkyTexture, LSBClient::noop))
-		.createCompositeState(false)
-	);
+	public static RenderType getSkyRenderType() {
+		if (skyRenderType == null) {
+			skyRenderType = RenderType.create(LiteralSkyBlock.SKY.toString(), DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS, 256, false, false, RenderType.CompositeState.builder()
+				.setShaderState(new RenderStateShard.ShaderStateShard(LSBClient::getSkyShader))
+				.setTextureState(new RenderStateShard.EmptyTextureStateShard(LSBClient::setSkyTexture, LSBClient::noop))
+				.createCompositeState(false)
+			);
+		}
+
+		return skyRenderType;
+	}
 
 	private static void setSkyTexture() {
 		if (skyRenderTarget != null) {

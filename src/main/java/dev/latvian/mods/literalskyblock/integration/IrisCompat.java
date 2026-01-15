@@ -36,31 +36,36 @@ public class IrisCompat {
 		PIPELINE = pipeline;
 	}
 
-	public static void preRender(LevelRenderer renderer) {
+	public static boolean preRender(LevelRenderer renderer) {
 		if (PIPELINE == null) {
-			return;
+			return false;
 		}
 		try {
 			Class<?> irisClass = resolveClass(IRIS_CLASS_NAMES);
 			if (irisClass == null) {
 				LOGGER.debug("Iris class not found, skipping Iris preRender.");
-				return;
+				return false;
 			}
 			Object pipelineManager = irisClass.getMethod("getPipelineManager").invoke(null);
 			Object currentDimension = irisClass.getMethod("getCurrentDimension").invoke(null);
 			Method preparePipeline = pipelineManager.getClass().getMethod("preparePipeline", currentDimension.getClass());
 			Object pipeline = preparePipeline.invoke(pipelineManager, currentDimension);
+			if (pipeline == null) {
+				return false;
+			}
 			PIPELINE.set(renderer, pipeline);
 			//pipeline.beginLevelRendering();
 			Class<?> phaseClass = resolveClass(WORLD_RENDERING_PHASE_CLASS_NAMES);
 			if (phaseClass == null) {
 				LOGGER.debug("Iris WorldRenderingPhase class not found, skipping Iris preRender.");
-				return;
+				return true;
 			}
 			Object nonePhase = phaseClass.getField("NONE").get(null);
 			pipeline.getClass().getMethod("setOverridePhase", phaseClass).invoke(pipeline, nonePhase);
+			return true;
 		} catch (ReflectiveOperationException | RuntimeException e) {
 			LOGGER.error("Exception in preRender", e);
+			return false;
 		}
 	}
 

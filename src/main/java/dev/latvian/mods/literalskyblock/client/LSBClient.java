@@ -86,9 +86,9 @@ public class LSBClient {
 		skyRenderTarget.clear(Minecraft.ON_OSX);
 		skyRenderTarget.bindWrite(false);
 
-		boolean irisActive = ModList.get().isLoaded("iris") && IrisCompat.shadersEnabled();
+		boolean irisLoaded = ModList.get().isLoaded("iris");
 		boolean irisPrepared = false;
-		if (irisActive) {
+		if (irisLoaded) {
 			irisPrepared = IrisCompat.preRender(mc.levelRenderer);
 		}
 

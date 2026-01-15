@@ -10,9 +10,18 @@ import java.lang.reflect.Method;
 public class IrisCompat {
 	private static final Logger LOGGER = LogUtils.getLogger();
 	private static final Field PIPELINE;
-	private static final String IRIS_CLASS = "net.coderbot.iris.Iris";
-	private static final String IRIS_API_CLASS = "net.irisshaders.iris.api.v0.IrisApi";
-	private static final String WORLD_RENDERING_PHASE_CLASS = "net.coderbot.iris.pipeline.WorldRenderingPhase";
+	private static final String[] IRIS_CLASS_NAMES = {
+		"net.irisshaders.iris.Iris",
+		"net.coderbot.iris.Iris"
+	};
+	private static final String[] IRIS_API_CLASS_NAMES = {
+		"net.irisshaders.iris.api.v0.IrisApi",
+		"net.coderbot.iris.api.v0.IrisApi"
+	};
+	private static final String[] WORLD_RENDERING_PHASE_CLASS_NAMES = {
+		"net.irisshaders.iris.pipeline.WorldRenderingPhase",
+		"net.coderbot.iris.pipeline.WorldRenderingPhase"
+	};
 
 	static {
 		Field pipeline;
@@ -32,14 +41,22 @@ public class IrisCompat {
 			return;
 		}
 		try {
-			Class<?> irisClass = Class.forName(IRIS_CLASS);
+			Class<?> irisClass = resolveClass(IRIS_CLASS_NAMES);
+			if (irisClass == null) {
+				LOGGER.debug("Iris class not found, skipping Iris preRender.");
+				return;
+			}
 			Object pipelineManager = irisClass.getMethod("getPipelineManager").invoke(null);
 			Object currentDimension = irisClass.getMethod("getCurrentDimension").invoke(null);
 			Method preparePipeline = pipelineManager.getClass().getMethod("preparePipeline", currentDimension.getClass());
 			Object pipeline = preparePipeline.invoke(pipelineManager, currentDimension);
 			PIPELINE.set(renderer, pipeline);
 			//pipeline.beginLevelRendering();
-			Class<?> phaseClass = Class.forName(WORLD_RENDERING_PHASE_CLASS);
+			Class<?> phaseClass = resolveClass(WORLD_RENDERING_PHASE_CLASS_NAMES);
+			if (phaseClass == null) {
+				LOGGER.debug("Iris WorldRenderingPhase class not found, skipping Iris preRender.");
+				return;
+			}
 			Object nonePhase = phaseClass.getField("NONE").get(null);
 			pipeline.getClass().getMethod("setOverridePhase", phaseClass).invoke(pipeline, nonePhase);
 		} catch (ReflectiveOperationException | RuntimeException e) {
@@ -62,7 +79,10 @@ public class IrisCompat {
 
 	public static boolean shadersEnabled() {
 		try {
-			Class<?> irisApiClass = Class.forName(IRIS_API_CLASS);
+			Class<?> irisApiClass = resolveClass(IRIS_API_CLASS_NAMES);
+			if (irisApiClass == null) {
+				return false;
+			}
 			Object irisApi = irisApiClass.getMethod("getInstance").invoke(null);
 			Object enabled = irisApiClass.getMethod("isShaderPackInUse").invoke(irisApi);
 			return enabled instanceof Boolean && (Boolean) enabled;
@@ -70,5 +90,16 @@ public class IrisCompat {
 			LOGGER.warn("Failed to query Iris shader state", e);
 			return false;
 		}
+	}
+
+	private static Class<?> resolveClass(String[] classNames) {
+		for (String className : classNames) {
+			try {
+				return Class.forName(className);
+			} catch (ClassNotFoundException ignored) {
+				// Try next fallback.
+			}
+		}
+		return null;
 	}
 }

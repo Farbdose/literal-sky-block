@@ -14,7 +14,9 @@ def isLocal = !ENV.containsKey("GITHUB_RUN_NUMBER")
 
 version = "${mod_version}-${isLocal ? "local.${Instant.now().epochSecond}" : "build.${ENV.GITHUB_RUN_NUMBER}"}"
 group = project.maven_group
-base.archivesBaseName = project.archives_base_name
+base {
+	archivesName.set(project.archives_base_name)
+}
 
 neoForge {
 	version = project.neoforge_version

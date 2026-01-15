@@ -28,6 +28,9 @@ public class IrisCompat {
 	}
 
 	public static boolean preRender(LevelRenderer renderer) {
+		if (!shadersEnabled()) {
+			return false;
+		}
 		if (PIPELINE == null) {
 			LOGGER.warn("Iris pipeline field missing; skipping Iris preRender.");
 			return false;

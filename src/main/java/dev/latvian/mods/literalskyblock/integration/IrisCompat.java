@@ -36,31 +36,41 @@ public class IrisCompat {
 		PIPELINE = pipeline;
 	}
 
-	public static void preRender(LevelRenderer renderer) {
+	public static boolean preRender(LevelRenderer renderer) {
 		if (PIPELINE == null) {
-			return;
+			return false;
 		}
 		try {
 			Class<?> irisClass = resolveClass(IRIS_CLASS_NAMES);
 			if (irisClass == null) {
 				LOGGER.debug("Iris class not found, skipping Iris preRender.");
-				return;
+				return false;
 			}
 			Object pipelineManager = irisClass.getMethod("getPipelineManager").invoke(null);
 			Object currentDimension = irisClass.getMethod("getCurrentDimension").invoke(null);
-			Method preparePipeline = pipelineManager.getClass().getMethod("preparePipeline", currentDimension.getClass());
+			Method preparePipeline = findPreparePipelineMethod(pipelineManager, currentDimension);
+			if (preparePipeline == null) {
+				LOGGER.debug("Iris preparePipeline method not found, skipping Iris preRender.");
+				return false;
+			}
 			Object pipeline = preparePipeline.invoke(pipelineManager, currentDimension);
+			if (pipeline == null) {
+				LOGGER.debug("Iris preparePipeline returned null pipeline, skipping Iris preRender.");
+				return false;
+			}
 			PIPELINE.set(renderer, pipeline);
 			//pipeline.beginLevelRendering();
 			Class<?> phaseClass = resolveClass(WORLD_RENDERING_PHASE_CLASS_NAMES);
 			if (phaseClass == null) {
 				LOGGER.debug("Iris WorldRenderingPhase class not found, skipping Iris preRender.");
-				return;
+				return false;
 			}
 			Object nonePhase = phaseClass.getField("NONE").get(null);
 			pipeline.getClass().getMethod("setOverridePhase", phaseClass).invoke(pipeline, nonePhase);
+			return true;
 		} catch (ReflectiveOperationException | RuntimeException e) {
 			LOGGER.error("Exception in preRender", e);
+			return false;
 		}
 	}
 
@@ -90,6 +100,26 @@ public class IrisCompat {
 			LOGGER.warn("Failed to query Iris shader state", e);
 			return false;
 		}
+	}
+
+	private static Method findPreparePipelineMethod(Object pipelineManager, Object currentDimension) {
+		if (pipelineManager == null || currentDimension == null) {
+			return null;
+		}
+		Class<?> pipelineManagerClass = pipelineManager.getClass();
+		for (Method method : pipelineManagerClass.getMethods()) {
+			if (!method.getName().equals("preparePipeline")) {
+				continue;
+			}
+			Class<?>[] parameterTypes = method.getParameterTypes();
+			if (parameterTypes.length != 1) {
+				continue;
+			}
+			if (parameterTypes[0].isInstance(currentDimension)) {
+				return method;
+			}
+		}
+		return null;
 	}
 
 	private static Class<?> resolveClass(String[] classNames) {

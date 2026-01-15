@@ -87,13 +87,18 @@ public class LSBClient {
 		skyRenderTarget.bindWrite(false);
 
 		boolean irisActive = ModList.get().isLoaded("iris") && IrisCompat.shadersEnabled();
+		boolean irisPrepared = false;
 		if (irisActive) {
-			IrisCompat.preRender(mc.levelRenderer);
+			irisPrepared = IrisCompat.preRender(mc.levelRenderer);
+			if (!irisPrepared) {
+				mc.getMainRenderTarget().bindWrite(false);
+				return;
+			}
 		}
 
 		((LevelRendererLSB) mc.levelRenderer).lsb$renderSky(event.getPartialTick(), event.getCamera(), mc.gameRenderer, skyRenderTarget);
 
-		if (irisActive) {
+		if (irisPrepared) {
 			IrisCompat.postRender(mc.levelRenderer);
 		}
 

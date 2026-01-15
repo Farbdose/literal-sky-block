@@ -15,14 +15,14 @@ This mod adds blocks that simulate the sky
 [[dependencies.literalskyblock]]
 modId = "neoforge"
 mandatory = true
-versionRange = "[21.0.148,)"
+versionRange = "[21.1.218,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.literalskyblock]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.21,)"
+versionRange = "[1.21.1,)"
 ordering = "NONE"
 side = "BOTH"
 

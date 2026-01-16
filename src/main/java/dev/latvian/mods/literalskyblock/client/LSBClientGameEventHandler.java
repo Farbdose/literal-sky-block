@@ -10,6 +10,10 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 public class LSBClientGameEventHandler {
 	@SubscribeEvent
 	public static void renderLast(RenderLevelStageEvent event) {
+		if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SOLID_BLOCKS) {
+			return;
+		}
+
 		LSBClient.renderSky(event);
 	}
 

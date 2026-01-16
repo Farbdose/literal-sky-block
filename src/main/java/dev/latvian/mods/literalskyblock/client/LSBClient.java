@@ -58,8 +58,8 @@ public class LSBClient {
 	}
 
 	public static void renderSky(RenderLevelStageEvent event) {
-		// AFTER_LEVEL ?
-		if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) {
+		// Render after the sky stage so captured frustum data is available before block entities.
+		if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) {
 			return;
 		}
 

@@ -8,14 +8,12 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import dev.latvian.mods.literalskyblock.LiteralSkyBlock;
-import dev.latvian.mods.literalskyblock.integration.IrisCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 
 public class LSBClient {
@@ -86,16 +84,7 @@ public class LSBClient {
 		skyRenderTarget.clear(Minecraft.ON_OSX);
 		skyRenderTarget.bindWrite(false);
 
-		boolean irisActive = ModList.get().isLoaded("iris") && IrisCompat.shadersEnabled();
-		if (irisActive) {
-			IrisCompat.preRender(mc.levelRenderer);
-		}
-
 		((LevelRendererLSB) mc.levelRenderer).lsb$renderSky(event.getPartialTick(), event.getCamera(), mc.gameRenderer, skyRenderTarget);
-
-		if (irisActive) {
-			IrisCompat.postRender(mc.levelRenderer);
-		}
 
 		mc.getMainRenderTarget().bindWrite(false);
 	}

@@ -114,9 +114,9 @@ public abstract class LevelRendererMixin implements LevelRendererLSB {
 		PoseStack posestack = new PoseStack();
 		this.checkPoseStack(posestack);
 
-		if (this.minecraft.options.getCloudsType() != CloudStatus.OFF) {
-			this.renderClouds(posestack, frustumMatrix, projectionMatrix, delta, camX, camY, camZ);
-		}
+		// if (this.minecraft.options.getCloudsType() != CloudStatus.OFF) {
+		this.renderClouds(posestack, frustumMatrix, projectionMatrix, delta, camX, camY, camZ);
+		// }
 
 		this.renderSnowAndRain(lightTexture, delta, camX, camY, camZ);
 

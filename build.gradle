@@ -93,6 +93,7 @@ repositories {
 dependencies {
 	// compileOnly("curse.maven:oculus-581495:5299671")
 	// compileOnly("curse.maven:rubidium-574856:4952685")
+	implementation("com.google.zxing:core:3.5.3")
 }
 
 processResources {

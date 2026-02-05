@@ -104,5 +104,21 @@ public class LSBClient {
 		builder.addVertex(w, h, 10F).setUv(1F, 0F);
 		builder.addVertex(w, 0F, 10F).setUv(1F, 1F);
 		BufferUploader.drawWithShader(builder.buildOrThrow());
+
+		var qrCodes = PhoneQrCodeManager.getQrCodes();
+		if (!qrCodes.isEmpty()) {
+			int padding = 6;
+			int y = h + padding;
+			int textOffset = 4;
+			var mc = Minecraft.getInstance();
+
+			for (var entry : qrCodes) {
+				int size = entry.size();
+				graphics.fill(0, y, size + 1, y + size + 1, 5, 0xFF000000);
+				graphics.blit(entry.texture(), 1, y + 1, 0, 0, size, size, size, size);
+				graphics.drawString(mc.font, entry.phoneNumber(), size + padding, y + (size - mc.font.lineHeight) / 2, 0xFFFFFFFF);
+				y += size + textOffset + padding;
+			}
+		}
 	}
 }
